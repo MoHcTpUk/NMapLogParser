@@ -1,5 +1,6 @@
 ﻿using CommandLine;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace NMapLogParser
@@ -34,7 +35,26 @@ namespace NMapLogParser
             }
 
             string readText = File.ReadAllText(filePath);
-            Console.WriteLine(readText);
+
+            var reports = new List<string>();
+
+            var lastReportPosition = 0;
+
+            while (lastReportPosition != -1)
+            {
+                var currentReportPosition = readText.IndexOf("Nmap scan report for", lastReportPosition+1, StringComparison.Ordinal);
+
+                if (currentReportPosition != -1)
+                    reports.Add(readText.Substring(lastReportPosition, currentReportPosition - lastReportPosition));
+
+                lastReportPosition = currentReportPosition;
+            }
+
+            // Remove "Starting Nmap" string
+            if (reports.Count > 0)
+                reports.RemoveAt(0);
+
+            Console.WriteLine($@"Finded {reports.Count} reports");
         }
     }
 }
