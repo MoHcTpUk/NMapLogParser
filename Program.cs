@@ -15,16 +15,20 @@ namespace NMapLogParser
             [Option('f', "file", Required = true, HelpText = "Set file to parse")]
             public string File { get; set; }
 
+            [Option('r', "rewrite", Required = false, HelpText = "Rewrite exists reports")]
+            public bool Rewrite { get; set; }
         }
 
         static void Main(string[] args)
         {
             string filePath = "";
+            bool rewrite = false;
 
             var parseResult = Parser.Default.ParseArguments<Options>(args)
                 .WithParsed(o =>
                 {
                     filePath = o.File;
+                    rewrite = o.Rewrite;
                 });
 
             if (parseResult.Tag == ParserResultType.NotParsed)
@@ -79,7 +83,7 @@ namespace NMapLogParser
 
                     Console.Write(@$"Writing {reportFileName} report... ");
 
-                    if (File.Exists(reportFilePath))
+                    if (File.Exists(reportFilePath) && !rewrite)
                     {
                         Console.WriteLine();
                         Console.WriteLine(@$"File {reportFilePath} already exists. Rewrite? Y/N");
